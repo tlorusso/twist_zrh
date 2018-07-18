@@ -4,4 +4,4 @@ This repository contains data of planed and effective flight arrival and departu
 
 The R-Script **data_enrichment.R** contains the code used to add the airport coordinates, calculate approximative flight-distances as well as time-differences between scheduled and effective flight-times.
 
-The RDS-file **flights_sf.RDS** contains the resulting R-dataframe.
+The RDS-file **flight_sf.RDS** contains the resulting R-dataframe.
