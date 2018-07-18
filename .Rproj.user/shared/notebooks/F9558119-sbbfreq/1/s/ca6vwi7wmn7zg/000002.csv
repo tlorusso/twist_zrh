@@ -1,0 +1,6 @@
+"0","```r
+#Gleiche Koordinaten an sbb-Datensatz an
+gemeinden2<-st_transform(gemeinden, crs = st_crs(sbb,asText=TRUE))
+#join municipality-infos to points
+dfspzh <- st_join(sbb, gemeinden2) %>% filter(!is.na(BFS))
+```"

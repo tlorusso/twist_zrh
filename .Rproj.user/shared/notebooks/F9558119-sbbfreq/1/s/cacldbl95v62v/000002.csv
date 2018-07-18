@@ -1,0 +1,49 @@
+"0","```r
+if (!require(pacman)) install.packages(pacman)
+p_load(sf,raster,tidyverse,ggrepel,tmap,tmaptools,statR)
+#Stationen - Passagierfrequenz
+sbb <-st_read('passagierfreq', stringsAsFactors = FALSE)
+```"
+"1","Reading layer `passagierfrequenz' from data source `L:\STAT\01_Post\LoRusso\ZHIZ\passagierfreq' using driver `ESRI Shapefile'
+Simple feature collection with 724 features and 8 fields
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: 5.999996 ymin: 45.83218 xmax: 9.641245 ymax: 47.69828
+epsg (SRID):    4326
+proj4string:    +proj=longlat +datum=WGS84 +no_defs
+"
+"0","```r
+sbbzug <-st_read('zugzahlen', stringsAsFactors = FALSE)
+```"
+"1","Reading layer `zugzahlen' from data source `L:\STAT\01_Post\LoRusso\ZHIZ\zugzahlen' using driver `ESRI Shapefile'
+replacing null geometries with empty geometries
+Simple feature collection with 9952 features and 19 fields (with 499 geometries empty)
+geometry type:  LINESTRING
+dimension:      XY
+bbox:           xmin: 5.971594 ymin: 45.82998 xmax: 9.641245 ymax: 47.72278
+epsg (SRID):    4326
+proj4string:    +proj=longlat +datum=WGS84 +no_defs
+"
+"0","```r
+#Gemeindeshapes
+gemeinden<- st_read('L:/STAT/08_DS/03_GIS/Geodaten/Administrative_Grenzen/Gemeinden/Politische_Gemeinden_ZH/Shapes_StÃ¤nde/Shape_detailliert_SEEN_2016', stringsAsFactors = FALSE)
+```"
+"1","Reading layer `UP_GEMEINDEN_SEEN_2016_F' from data source `L:\STAT\08_DS\03_GIS\Geodaten\Administrative_Grenzen\Gemeinden\Politische_Gemeinden_ZH\Shapes_StÃƒÂ¤nde\Shape_detailliert_SEEN_2016' using driver `ESRI Shapefile'
+Simple feature collection with 179 features and 9 fields
+geometry type:  POLYGON
+dimension:      XY
+bbox:           xmin: 2669245 ymin: 1223895 xmax: 2716901 ymax: 1283343
+epsg (SRID):    NA
+proj4string:    +proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +units=m +no_defs
+"
+"0","```r
+#CRS CH LV95
+st_crs(gemeinden)<- \"+init=epsg:2056\"
+```"
+"1","st_crs<- : replacing crs does not reproject data; use st_transform for that
+"
+"0","```r
+#Projektion
+sbb <- st_transform(sbb,\"+init=epsg:4326 +proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +units=m +no_defs\")
+sbbzug <- st_transform(sbbzug,\"+init=epsg:4326 +proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +units=m +no_defs\")
+```"
