@@ -6,7 +6,7 @@ The R-Script **data_enrichment.R** contains the code used to add the airport coo
 
 The RDS-file **flight_sf.RDS** contains the resulting R-dataframe.
 
-# TODO : enrich dataset with weather-condition variables
+## TODO : enrich dataset with weather-condition variables
 
 Define in what form weather-condition variables can be used as predictors and where to find relevant data.
 
