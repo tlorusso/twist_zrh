@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1533557745582.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "B57838A6",
+    "lastKnownWriteTime" : 29555366483525734,
+    "last_content_update" : 1533557745582,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "D62A635A",
+        "caption" : "flight_sf",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=flight_sf&cache_key=D62A635A",
+        "displayedObservations" : "236351",
+        "environment" : "",
+        "object" : "flight_sf",
+        "preview" : "0",
+        "totalObservations" : "236351",
+        "variables" : "31"
+    },
+    "relative_order" : 9,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
