@@ -10,7 +10,13 @@ The RDS-file **flight_sf.RDS** contains the resulting R-dataframe.
 
 Define in what form weather-condition variables can be used as predictors and where to find relevant data.
 
-Potential sources for weather conditions:
+Meteoswiss provides us with the following indicators related to the weatherconditions around the airport of Zurich:
+
+- Windspeeds (hourly max.)
+- Precipitation (hourly quantities)
+- Number of lightnings strikes in airport-proximity (hourly)
+
+Further sources for weather data at global scale or atmospheric conditions:
 
 - meteorogical conditions on the ground via NASApower: https://adamhsparks.github.io/nasapower/
 
