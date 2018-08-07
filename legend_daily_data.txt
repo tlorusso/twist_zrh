@@ -1,0 +1,156 @@
+Bundesamt für Meteorologie und Klimatologie, MeteoSchweiz
+Operation Center 1
+Postfach 257
+8058 Zürich-Flughafen
+
+stn yyyyMMddHHmm
+
+stn Stationskürzel
+y   Jahr
+M   Monat
+d   Tag
+H   Stunde
+m   Minute
+
+Zeitangaben in UTC: 00:40 UTC = 02:40 Sommerzeit
+                              = 01:40 Winterzeit
+
+Zeitbezug bei Stundenwerten, sofern in der Parameterbeschreibung nicht anders vermerkt: HH  = (HH-1):41 - HH:40
+Beispiel: 13 = beinhaltet Messperiode von 12:41 bis 13:40 
+
+Fehlende Messwerte sind gekenntzeichnet mit '-'
+
+Qualitätsinformationen: Die Legende zu den Qualitätsinformationen ist zu finden unter: https://gate.meteoswiss.ch/idaweb/text/datenqualitaet_legende_de.pdf
+
+ 
+
+
+
+
+Stationen
+---------
+stn       Name                                 Parameter        Datenquelle                                        Länge/Breite             Koordinaten [km] Höhe ü. M. [m]
+BAS       Basel / Binningen                    breclod0         MeteoSchweiz                                       7°35'/47°32'             610908/265611    316
+BAS       Basel / Binningen                    brefard0         MeteoSchweiz                                       7°35'/47°32'             610908/265611    316
+BAS       Basel / Binningen                    dkl010d0         MeteoSchweiz                                       7°35'/47°32'             610908/265611    316
+BAS       Basel / Binningen                    fu3010d0         MeteoSchweiz                                       7°35'/47°32'             610908/265611    316
+BAS       Basel / Binningen                    fu3010d1         MeteoSchweiz                                       7°35'/47°32'             610908/265611    316
+BAS       Basel / Binningen                    gre000d0         MeteoSchweiz                                       7°35'/47°32'             610908/265611    316
+BAS       Basel / Binningen                    hns000d0         MeteoSchweiz                                       7°35'/47°32'             610908/265611    316
+BAS       Basel / Binningen                    hto000d0         MeteoSchweiz                                       7°35'/47°32'             610908/265611    316
+BAS       Basel / Binningen                    pp0qnhd0         MeteoSchweiz                                       7°35'/47°32'             610908/265611    316
+BAS       Basel / Binningen                    rka150d0         MeteoSchweiz                                       7°35'/47°32'             610908/265611    316
+BAS       Basel / Binningen                    sremaxdv         MeteoSchweiz                                       7°35'/47°32'             610908/265611    316
+BAS       Basel / Binningen                    su2000d0         MeteoSchweiz                                       7°35'/47°32'             610908/265611    316
+BAS       Basel / Binningen                    tre200d0         MeteoSchweiz                                       7°35'/47°32'             610908/265611    316
+BAS       Basel / Binningen                    tre200dn         MeteoSchweiz                                       7°35'/47°32'             610908/265611    316
+BAS       Basel / Binningen                    tre200dv         MeteoSchweiz                                       7°35'/47°32'             610908/265611    316
+BAS       Basel / Binningen                    tre200dx         MeteoSchweiz                                       7°35'/47°32'             610908/265611    316
+BAS       Basel / Binningen                    ure200d0         MeteoSchweiz                                       7°35'/47°32'             610908/265611    316
+BER       Bern / Zollikofen                    breclod0         MeteoSchweiz                                       7°28'/46°59'             601933/204409    552
+BER       Bern / Zollikofen                    brefard0         MeteoSchweiz                                       7°28'/46°59'             601933/204409    552
+BER       Bern / Zollikofen                    dkl010d0         MeteoSchweiz                                       7°28'/46°59'             601933/204409    552
+BER       Bern / Zollikofen                    fu3010d0         MeteoSchweiz                                       7°28'/46°59'             601933/204409    552
+BER       Bern / Zollikofen                    fu3010d1         MeteoSchweiz                                       7°28'/46°59'             601933/204409    552
+BER       Bern / Zollikofen                    gre000d0         MeteoSchweiz                                       7°28'/46°59'             601933/204409    552
+BER       Bern / Zollikofen                    hns000d0         MeteoSchweiz                                       7°28'/46°59'             601933/204409    552
+BER       Bern / Zollikofen                    hto000d0         MeteoSchweiz                                       7°28'/46°59'             601933/204409    552
+BER       Bern / Zollikofen                    pp0qnhd0         MeteoSchweiz                                       7°28'/46°59'             601933/204409    552
+BER       Bern / Zollikofen                    rka150d0         MeteoSchweiz                                       7°28'/46°59'             601933/204409    552
+BER       Bern / Zollikofen                    sremaxdv         MeteoSchweiz                                       7°28'/46°59'             601933/204409    552
+BER       Bern / Zollikofen                    su2000d0         MeteoSchweiz                                       7°28'/46°59'             601933/204409    552
+BER       Bern / Zollikofen                    tre200d0         MeteoSchweiz                                       7°28'/46°59'             601933/204409    552
+BER       Bern / Zollikofen                    tre200dn         MeteoSchweiz                                       7°28'/46°59'             601933/204409    552
+BER       Bern / Zollikofen                    tre200dv         MeteoSchweiz                                       7°28'/46°59'             601933/204409    552
+BER       Bern / Zollikofen                    tre200dx         MeteoSchweiz                                       7°28'/46°59'             601933/204409    552
+BER       Bern / Zollikofen                    ure200d0         MeteoSchweiz                                       7°28'/46°59'             601933/204409    552
+KLO       Zürich / Kloten                      breclod0         MeteoSchweiz                                       8°32'/47°29'             682710/259338    426
+KLO       Zürich / Kloten                      brefard0         MeteoSchweiz                                       8°32'/47°29'             682710/259338    426
+KLO       Zürich / Kloten                      dkl010d0         MeteoSchweiz                                       8°32'/47°29'             682710/259338    426
+KLO       Zürich / Kloten                      fu3010d0         MeteoSchweiz                                       8°32'/47°29'             682710/259338    426
+KLO       Zürich / Kloten                      fu3010d1         MeteoSchweiz                                       8°32'/47°29'             682710/259338    426
+KLO       Zürich / Kloten                      gre000d0         MeteoSchweiz                                       8°32'/47°29'             682710/259338    426
+KLO       Zürich / Kloten                      hns000d0         MeteoSchweiz                                       8°32'/47°29'             682710/259338    426
+KLO       Zürich / Kloten                      hto000d0         MeteoSchweiz                                       8°32'/47°29'             682710/259338    426
+KLO       Zürich / Kloten                      pp0qnhd0         MeteoSchweiz                                       8°32'/47°29'             682710/259338    426
+KLO       Zürich / Kloten                      rka150d0         MeteoSchweiz                                       8°32'/47°29'             682710/259338    426
+KLO       Zürich / Kloten                      sremaxdv         MeteoSchweiz                                       8°32'/47°29'             682710/259338    426
+KLO       Zürich / Kloten                      su2000d0         MeteoSchweiz                                       8°32'/47°29'             682710/259338    426
+KLO       Zürich / Kloten                      tre200d0         MeteoSchweiz                                       8°32'/47°29'             682710/259338    426
+KLO       Zürich / Kloten                      tre200dn         MeteoSchweiz                                       8°32'/47°29'             682710/259338    426
+KLO       Zürich / Kloten                      tre200dv         MeteoSchweiz                                       8°32'/47°29'             682710/259338    426
+KLO       Zürich / Kloten                      tre200dx         MeteoSchweiz                                       8°32'/47°29'             682710/259338    426
+KLO       Zürich / Kloten                      ure200d0         MeteoSchweiz                                       8°32'/47°29'             682710/259338    426
+LUZ       Luzern                               breclod0         MeteoSchweiz                                       8°18'/47°02'             665543/209849    454
+LUZ       Luzern                               brefard0         MeteoSchweiz                                       8°18'/47°02'             665543/209849    454
+LUZ       Luzern                               dkl010d0         MeteoSchweiz                                       8°18'/47°02'             665543/209849    454
+LUZ       Luzern                               fu3010d0         MeteoSchweiz                                       8°18'/47°02'             665543/209849    454
+LUZ       Luzern                               fu3010d1         MeteoSchweiz                                       8°18'/47°02'             665543/209849    454
+LUZ       Luzern                               gre000d0         MeteoSchweiz                                       8°18'/47°02'             665543/209849    454
+LUZ       Luzern                               hns000d0         MeteoSchweiz                                       8°18'/47°02'             665543/209849    454
+LUZ       Luzern                               hto000d0         MeteoSchweiz                                       8°18'/47°02'             665543/209849    454
+LUZ       Luzern                               pp0qnhd0         MeteoSchweiz                                       8°18'/47°02'             665543/209849    454
+LUZ       Luzern                               rka150d0         MeteoSchweiz                                       8°18'/47°02'             665543/209849    454
+LUZ       Luzern                               sremaxdv         MeteoSchweiz                                       8°18'/47°02'             665543/209849    454
+LUZ       Luzern                               su2000d0         MeteoSchweiz                                       8°18'/47°02'             665543/209849    454
+LUZ       Luzern                               tre200d0         MeteoSchweiz                                       8°18'/47°02'             665543/209849    454
+LUZ       Luzern                               tre200dn         MeteoSchweiz                                       8°18'/47°02'             665543/209849    454
+LUZ       Luzern                               tre200dv         MeteoSchweiz                                       8°18'/47°02'             665543/209849    454
+LUZ       Luzern                               tre200dx         MeteoSchweiz                                       8°18'/47°02'             665543/209849    454
+LUZ       Luzern                               ure200d0         MeteoSchweiz                                       8°18'/47°02'             665543/209849    454
+SMA       Zürich / Fluntern                    breclod0         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    brefard0         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    dkl010d0         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    fu3010d0         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    fu3010d1         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    gre000d0         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    hns000d0         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    hto000d0         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    pp0qnhd0         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    rka150d0         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    sremaxdv         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    su2000d0         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    tre200d0         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    tre200dn         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    tre200dv         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    tre200dx         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+SMA       Zürich / Fluntern                    ure200d0         MeteoSchweiz                                       8°34'/47°23'             685116/248065    555
+STG       St. Gallen                           breclod0         MeteoSchweiz                                       9°24'/47°26'             747865/254588    775
+STG       St. Gallen                           brefard0         MeteoSchweiz                                       9°24'/47°26'             747865/254588    775
+STG       St. Gallen                           dkl010d0         MeteoSchweiz                                       9°24'/47°26'             747865/254588    775
+STG       St. Gallen                           fu3010d0         MeteoSchweiz                                       9°24'/47°26'             747865/254588    775
+STG       St. Gallen                           fu3010d1         MeteoSchweiz                                       9°24'/47°26'             747865/254588    775
+STG       St. Gallen                           gre000d0         MeteoSchweiz                                       9°24'/47°26'             747865/254588    775
+STG       St. Gallen                           hns000d0         MeteoSchweiz                                       9°24'/47°26'             747865/254588    775
+STG       St. Gallen                           hto000d0         MeteoSchweiz                                       9°24'/47°26'             747865/254588    775
+STG       St. Gallen                           pp0qnhd0         MeteoSchweiz                                       9°24'/47°26'             747865/254588    775
+STG       St. Gallen                           rka150d0         MeteoSchweiz                                       9°24'/47°26'             747865/254588    775
+STG       St. Gallen                           sremaxdv         MeteoSchweiz                                       9°24'/47°26'             747865/254588    775
+STG       St. Gallen                           su2000d0         MeteoSchweiz                                       9°24'/47°26'             747865/254588    775
+STG       St. Gallen                           tre200d0         MeteoSchweiz                                       9°24'/47°26'             747865/254588    775
+STG       St. Gallen                           tre200dn         MeteoSchweiz                                       9°24'/47°26'             747865/254588    775
+STG       St. Gallen                           tre200dv         MeteoSchweiz                                       9°24'/47°26'             747865/254588    775
+STG       St. Gallen                           tre200dx         MeteoSchweiz                                       9°24'/47°26'             747865/254588    775
+STG       St. Gallen                           ure200d0         MeteoSchweiz                                       9°24'/47°26'             747865/254588    775
+
+Parameter
+---------
+          Einheit                              Beschreibung
+breclod0  No                                   Nahblitze (Entfernung weniger als 3 km); Tagessumme
+brefard0  No                                   Fernblitze (Entfernung 3 - 30 km); Tagessumme
+dkl010d0  °                                    Windrichtung; Tagesmittel
+fu3010d0  km/h                                 Windgeschwindigkeit skalar; Tagesmittel
+fu3010d1  km/h                                 Böenspitze (Sekundenböe); Tagesmaximum
+gre000d0  W/m²                                 Globalstrahlung; Tagesmittel
+hns000d0  cm                                   Neuschneehöhe; Tagessumme 6 UTC - 6 UTC Folgetag
+hto000d0  cm                                   Gesamtschneehöhe; Morgenmessung von 6 UTC
+pp0qnhd0  hPa                                  Luftdruck reduziert auf Meeresniveau mit Standardatmosphäre (QNH); Tagesmittel
+rka150d0  mm                                   Niederschlag; Kalendertag
+sremaxdv  %                                    Sonnenscheindauer; relativ zur absolut möglichen Tagessumme
+su2000d0  h                                    Sonnenscheindauer; Tagessumme
+tre200d0  °C                                   Lufttemperatur 2 m über Boden; Tagesmittel
+tre200dn  °C                                   Lufttemperatur 2 m über Boden; Tagesminimum
+tre200dv  °C                                   Lufttemperatur 2 m über Boden; Abweichung des Tagesmittels von der Norm
+tre200dx  °C                                   Lufttemperatur 2 m über Boden; Tagesmaximum
+ure200d0  %                                    Relative Luftfeuchtigkeit 2 m über Boden; Tagesmittel
+
