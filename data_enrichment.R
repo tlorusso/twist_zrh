@@ -38,11 +38,34 @@ library(lwgeom)
 flights_sf <- st_as_sf(flights_airports,  
                         coords = c("longitude_deg","latitude_deg"),
                         crs = "+proj=longlat +datum=WGS84") %>% 
-                        #calculate distance to Zurich Airport (lat long )
-                        mutate(distance=st_distance(geometry,st_geometry(st_point(c(47.464699, 8.54917))) %>% 
-                                                      st_set_crs(st_crs("+proj=longlat +datum=WGS84"))))
+                        #calculate distance to Zurich Airport (long, lat )
+  mutate(distance_km=as.numeric(st_distance(geometry,st_geometry(st_point(c(8.54917,47.464699))) %>% 
+                                                      st_set_crs(st_crs("+proj=longlat +datum=WGS84"))))/1000)
+       
+# library(geosphere)
+# # alternative to st_distance
+# distm(c(sf::st_coordinates(flight_sf$geometry[79])), c(8.551364,47.465318), fun = distHaversine) 
+                
+saveRDS(flights_sf,"flight_sf.RDS")
+
+
+# TODO : Join meteoswiss-weatherdata to flights
+
+library(lubridate)
+
+#read in hourly weatherdata
+weather <- read.table("weatherstations_hourly.txt",sep=";", header=T)
+
+#convert datetime-string to POSIXct-date format
+weather <-weather %>%  mutate(datetime=as.POSIXct(strptime(weather$time, "%Y%m%d%H"))) 
+
+#round planed time to full hours to be able to join hourly weather data to it (filter for station at KLOTEN)
+flights_sf <- flights_sf %>% mutate(planed_hour =round_date(planed_time,unit="1 hour")) %>% 
+              left_join(weather %>% filter(stn=="KLO"), by=c("planed_hour"="datetime"))
 
 saveRDS(flights_sf,"flight_sf.RDS")
+
+
 
 
 
