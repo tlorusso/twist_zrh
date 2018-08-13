@@ -46,7 +46,7 @@ flights_sf <- st_as_sf(flights_airports,
 # # alternative to st_distance
 # distm(c(sf::st_coordinates(flight_sf$geometry[79])), c(8.551364,47.465318), fun = distHaversine) 
                 
-saveRDS(flights_sf,"flight_sf.RDS")
+# saveRDS(flights_sf,"flight_sf.RDS")
 
 
 # TODO : Join meteoswiss-weatherdata to flights
@@ -63,10 +63,26 @@ weather <-weather %>%  mutate(datetime=as.POSIXct(strptime(weather$time, "%Y%m%d
 flights_sf <- flights_sf %>% mutate(planed_hour =round_date(planed_time,unit="1 hour")) %>% 
               left_join(weather %>% filter(stn=="KLO"), by=c("planed_hour"="datetime"))
 
-saveRDS(flights_sf,"flight_sf.RDS")
+
+# drop, reorder and rename columns
+flights_sf2<-flights_sf %>% 
+  select(date, effective_time, planed_time, diff_in_secs=diff,
+         airline_code, airline_name, flightnr = Flugnummer, start_landing, airplane_type,
+         origin_destination_code=origin_destination, origin_destination_name = name, airport_type=type, 
+         distance_km, iso_country,iso_region,municipality,continent= continent.y, schengen= Schengen,
+         #weather variables
+        lightnings_hour_n=brecloh0, lightnings_hour_f=brefarh0,
+        winddir_h=dkl010h0, windspeed_avg_h=fu3010h0,windspeed_peak_h=fu3010h1,
+        global_rad_avg_h=gre000h0 ,airpres=pp0qnhh0 ,precip=rre150h0 ,sunshine_dur_min=sre000h0 ,
+        tde200h0 ,temp_avg=tre200h0  ,
+        temp_min=tre200hn ,temp_max=tre200hx, rel_humid=ure200h0)
+
+#save!
+
+saveRDS(flights_sf2,"twist_zrh.RDS")
+
+write.csv(flights_sf2,"twist_zrh.csv")
 
 
-
-
-
-
+# library('corrplot') #package corrplot
+# corrplot(, method = "circle") #plot matrix
