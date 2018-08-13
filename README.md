@@ -2,7 +2,7 @@
 
 This repository contains data of planed and effective flight arrival and departure-times from / to the airport of Zurich for the entire year 2017. 
 
-The R-Script **data_enrichment.R** contains the code used to add the airport coordinates, calculate approximative flight-distances as well as time-differences between scheduled and effective flight-times as well as information on weather-conditions around the airport (provided by meteoswiss). The dataset does not yet contain information on general weather and atmospheric conditions other than those at the local scale. 
+The R-Script **data_enrichment.R** contains the code used to add the airport coordinates, calculate approximative flight-distances, time-differences between scheduled and effective flight-times as well as information on weather-conditions around the airport provided by meteoswiss. The dataset does not yet contain information on general weather and atmospheric conditions other than those at the local scale. 
 
 The RDS-file **twist_zrh.RDS** contains the resulting R-dataframe. For those relying on other tools than r, a csv-version of the dataset is also available: **twist_zrh.csv**
 
