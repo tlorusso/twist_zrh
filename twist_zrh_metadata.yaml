@@ -1,0 +1,40 @@
+title: Flights from / to Zurich Airport
+
+source.name: Zurich Airport
+
+description: dataset of flights from / to zurich airport enriched with data from the origin/destination airports, calculated distances as well as weather-data from meteo.swiss.
+
+labels:
+    dimnames:
+         date: 'date of the flight'
+         effective_time: 'Time of the departure / arrival (effective)'
+         planed_time: 'Time of the departure / arrival (scheduled)'
+         diff_in_secs: 'Difference of planed-effective times'
+         airline_code: 'Code of the Airline'
+         airline_name: 'Name of the Airline'
+         flightnr: 'code of the flight'
+         start_landing: 'Category of the flight(S= Start, L= Landing)'
+         airplane_type: 'airplane-type'
+         origin_destination_code: 'IATA-airport-code of the destination / origin'
+         origin_destination_name: 'name of the destination / origin-airport'
+         distance_km: 'distance of the origin / destination in km'
+         iso_country: 'iso-code of the origin / destination (country)'
+         iso_region: 'iso-code of the origin / destination (region)'
+         municipality: 'municipality of the origin / destination'
+         continent:'continent of the origin / destination'
+         schengen:'binary code to differentiate between schengen- and non-schengen flights'
+         lightnings_hour_n:'number of lightnings in airport-proximity (<3km distance), hourly sum'
+         lightnings_hour_f:'number of lightnings in airport-proximity (3-30km distance), hourly sum'
+         winddir_h: 'wind direction in airport-proximity, hourly average'
+         windspeed_avg_h: 'wind-speed (km/h) in airport-proximity, hourly average'
+         windspeed_peak_h: 'wind-speed (km/h) in airport-proximity, hourly maximum'
+         global_rad_avg_h: 'global radiation (W/m2) in airport-proximity, hourly average'
+         airpres: 'Air pressure (hPA) reduced to sea level with standard atmosphere (QNH), hourly average'
+         precip: 'precipitation (mm), hourly sum'
+         sunshine_dur_min: 'sunshine (min), hourly sum'
+         temp_avg: 'temperature (C) 2m above ground, hourly average'
+         temp_min: 'temperature (C) 2m above ground, hourly minimum'
+         temp_min: 'temperature (C) 2m above ground, hourly maximum'
+         rel_humid: 'relative humidity (%) 2m above ground, hourly average'
+         geometry: 'long/lat coordinates of the origin / destination-airport'
+         
