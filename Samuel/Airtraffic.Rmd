@@ -1,0 +1,255 @@
+---
+title: 'Twist 2018: Airtraffic challenge'
+output:
+ prettydoc::html_pretty:
+   theme: cayman
+   highlight: github
+   toc: true
+   number_sections: true
+   df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE, fig.align = "center")
+```
+
+# Libraries and data
+```{r}
+rm(list = ls())
+library(tidyverse)
+library(lubridate)
+library(gridExtra)
+library(ggfortify)
+```
+
+```{r}
+# flightdata <- readRDS("twist_zrh/twist_zrh.RDS")
+# 
+# fac2num <- function(x) as.numeric(as.character(x))
+# flightdata <- flightdata %>%
+#   mutate(date = as.Date(flightdata$date, "%d.%m.%Y")) %>%
+#   mutate_at(vars(lightnings_hour_n, lightnings_hour_f,
+#                  winddir_h, windspeed_avg_h, windspeed_peak_h,
+#                  global_rad_avg_h, global_rad_avg_h, airpres,
+#                  sunshine_dur_min, temp_avg, temp_min,
+#                  temp_max, rel_humid, precip), fac2num)
+# glimpse(flightdata)
+# write_rds(flightdata, "twist_zrh_cleaned.RDS")
+flightdata <- readRDS("twist_zrh_cleaned.RDS")
+flightdata <- na.omit(flightdata)
+
+flightdata <- flightdata %>%
+  mutate(month = month(date),
+         hour = hour(planed_time),
+         continent = as.character(continent)) %>%
+  mutate(month = as.factor(month),
+         hour = as.factor(hour),
+         continent = as.factor(continent))
+glimpse(flightdata)
+
+flightdata <- flightdata %>%
+  mutate(delayed = ifelse(abs(as.numeric(diff_in_secs)) > 1800, 1, 0))
+flightdata_landing <- flightdata %>%
+  filter(start_landing == "L")
+flightdata_starting <- flightdata %>%
+  filter(start_landing == "S")
+```
+
+# EDA visualization
+## Looking at time difference distribution
+```{r}
+plot_all <- flightdata %>%
+  ggplot(aes(x = diff_in_secs)) + 
+    geom_histogram(bins = 60, col = 1) +
+    labs(title = "starting flights: full dataset") +
+    facet_wrap(~ start_landing)
+
+plot_withoutoutliers <- flightdata %>%
+  filter(abs(diff_in_secs) < 10000) %>%
+  ggplot(aes(x = diff_in_secs)) + 
+    geom_histogram(bins = 60, col = 1) +
+    labs(title = "absolute difference < 10000") +
+    facet_wrap(~ start_landing)
+
+grid.arrange(plot_all, plot_withoutoutliers, ncol = 2)
+```
+
+## Boxplots for different months and hours of the day
+```{r}
+flightdata %>%
+  filter(abs(diff_in_secs) < 5000) %>%
+  ggplot(aes(x = month, y = as.numeric(diff_in_secs))) + 
+    geom_boxplot() +
+    facet_wrap(~ start_landing)
+flightdata %>%
+  filter(abs(diff_in_secs) < 5000) %>%
+  ggplot(aes(x = hour, y = as.numeric(diff_in_secs))) + 
+    geom_boxplot() +
+    facet_wrap(~ start_landing)
+flightdata_landing <- flightdata %>%
+  filter(start_landing == "L")
+flightdata_starting <- flightdata %>%
+  filter(start_landing == "S")
+```
+
+## Comparing Schengen to non-Schengen
+```{r}
+flightdata %>%
+  ggplot(aes(x = schengen, y = as.numeric(diff_in_secs))) +
+    geom_boxplot() +
+    facet_wrap(~ start_landing) +
+    ylim(-5000, 5000) +
+    labs(y = "Difference in seconds")
+```
+
+
+## Airlines and airplane types
+```{r}
+flightdata %>%
+  arrange(airline_name) %>%
+  group_by(airline_name) %>%
+  filter(n() > 1000) %>%
+  ggplot(aes(x = airline_name, y = as.numeric(diff_in_secs), 
+                         group = airline_name)) +
+    geom_boxplot() +
+    geom_hline(yintercept = 0, col = 4) +
+    facet_wrap(~ start_landing) + 
+    ylim(-5000, 10000) +
+    coord_flip() +
+    labs(x = "Airline name", y = "Difference in seconds", 
+         title = "Airlines with more than 1000 flights")
+
+flightdata %>%
+  arrange(airplane_type) %>%
+  group_by(airplane_type) %>%
+  filter(n() > 100) %>%
+  ggplot(aes(x = airplane_type, y = as.numeric(diff_in_secs), 
+                         group = airplane_type)) +
+    geom_boxplot() +
+    geom_hline(yintercept = 0, col = 4) +
+    facet_wrap(~ start_landing) +
+    ylim(-5000, 10000) +
+    coord_flip() +
+    labs(x = "Airplane type", y = "Difference in seconds", 
+         title = "Airplane types with more than 100 flights")
+```
+
+# Modeling
+## Linear model with quantiative covariates  
+```{r}
+model1 <- as.formula(as.numeric(diff_in_secs) ~ distance_km + windspeed_avg_h
+                     + temp_avg + rel_humid + lightnings_hour_n + lightnings_hour_f
+                     + sunshine_dur_min + airpres + global_rad_avg_h)
+fit1 <- lm(model1, flightdata_starting)
+summary(fit1)
+autoplot(fit1)
+```
+
+Residuals clearly not Gaussian!
+
+## Best subset model selection with BIC criterion  
+```{r}
+library(leaps)
+modelall <- as.formula(as.numeric(diff_in_secs) ~ distance_km + windspeed_avg_h
+                     + temp_avg + rel_humid + lightnings_hour_n + lightnings_hour_f
+                     + sunshine_dur_min + airpres + global_rad_avg_h + temp_max
+                     + temp_min + precip + windspeed_peak_h + windspeed_peak_h)
+modelselection <- regsubsets(modelall, data = flightdata_starting, nvmax = 14)
+minmodel <- which.min(summary(modelselection)$bic)
+bestmodel <- as.formula(paste(c("as.numeric(diff_in_secs) ~ ", 
+                                paste(names(coef(modelselection, minmodel)[-1]), 
+                                      collapse = "+")), collapse = ""))
+bestfit <- lm(bestmodel, flightdata_starting)
+summary(bestfit)
+autoplot(bestfit)
+```
+
+8 out of 9 variables are included, but the residuals are still not looking Gaussian!
+
+
+## Logistic regression model using delay > 30 min as outcome
+```{r}
+model_glm <- as.formula(delayed ~ distance_km + windspeed_avg_h + schengen
+                     + temp_avg + rel_humid + lightnings_hour_n + lightnings_hour_f
+                     + sunshine_dur_min + airpres + global_rad_avg_h + temp_max
+                     + temp_min + precip + windspeed_peak_h + windspeed_peak_h)
+fit_glm1 <- glm(model_glm, data = flightdata_starting, family = "binomial")
+summary(fit_glm1)
+
+# missclassification
+mean(flightdata_starting$delayed != as.numeric(predict(fit_glm1, type = "response") > 0.5))
+```
+
+## Adding months and hours to models
+```{r}
+bestmodel_withtime <- update(bestmodel, . ~ . + month + hour)
+fit_time <- lm(bestmodel_withtime, flightdata_starting)
+summary(fit_time)
+autoplot(fit_time)
+```
+
+Ok, linear regression performance is bad and the residuals are clearly not Gaussian, we should use logistic regression from now on!
+
+```{r}
+glm_month <- as.formula(delayed ~ distance_km + windspeed_avg_h + schengen
+                     + temp_avg + rel_humid + lightnings_hour_n + lightnings_hour_f
+                     + sunshine_dur_min + airpres + global_rad_avg_h + temp_max
+                     + temp_min + precip + windspeed_peak_h + month)
+fit_glm_month <- glm(glm_month, data = flightdata_starting, family = "binomial")
+summary(fit_glm_month)
+mean(flightdata_starting$delayed != as.numeric(predict(fit_glm_month, type = "response") > 0.5))
+
+glm_month_hour <- as.formula(delayed ~ distance_km + windspeed_avg_h + schengen
+                     + temp_avg + rel_humid + lightnings_hour_n + lightnings_hour_f
+                     + sunshine_dur_min + airpres + global_rad_avg_h + temp_max
+                     + temp_min + precip + windspeed_peak_h + month + hour)
+fit_glm_month_hour <- glm(glm_month_hour, data = flightdata_starting, family = "binomial")
+summary(fit_glm_month)
+mean(flightdata_starting$delayed != as.numeric(predict(fit_glm_month_hour, type = "response") > 0.5))
+
+anova(fit_glm_month, fit_glm_month_hour, test = "LR")
+```
+
+## Getting cross-validation missclassification rate
+```{r}
+set.seed(123)
+Kfold_cv_glm <- function(model_form, data, K){
+  n <- nrow(data)
+  ind_permuted <- sample(n, n, replace = FALSE)
+  folds <- cut(ind_permuted, K, labels = FALSE)
+  missclass <- sapply(seq(2), function(k){
+    train <- which(folds != k)
+    fit <- glm(model_form, data = data[train,], family = "binomial")
+    mean(data$delayed[-train] != as.numeric(predict(fit, newdata = data[-train,], type = "response") > 0.5))
+  })
+  return(missclass)
+}
+missclassification_cv <- Kfold_cv_glm(glm_month_hour, flightdata_starting, 10)
+mean(missclassification_cv)
+```
+
+## Plotting model predictions
+```{r fig.height = 5}
+library(visreg)
+distance <- visreg(fit_glm_month_hour, "distance_km", scale = "response", gg = TRUE) + ylim(0, 0.6)
+windspeed <- visreg(fit_glm_month_hour, "windspeed_avg_h", scale = "response", gg = TRUE) + ylim(0, 0.6)
+airpressure <- visreg(fit_glm_month_hour, "airpres", scale = "response", gg = TRUE) + ylim(0, 0.6)
+lightning <- visreg(fit_glm_month_hour, "lightnings_hour_f", scale = "response", gg = TRUE) + ylim(0, 0.6)
+grid.arrange(distance, windspeed, airpressure, lightning, ncol = 2)
+
+sunshine <- visreg(fit_glm_month_hour, "sunshine_dur_min", scale = "response", gg = TRUE) + ylim(0, 0.6)
+windspeed <- visreg(fit_glm_month_hour, "windspeed_avg_h", scale = "response", gg = TRUE) + ylim(0, 0.6)
+global_radiation <- visreg(fit_glm_month_hour, "global_rad_avg_h", scale = "response", gg = TRUE) + ylim(0, 0.6)
+months <- visreg(fit_glm_month_hour, "month", scale = "response", gg = TRUE) + ylim(0, 0.6)
+grid.arrange(sunshine, windspeed, global_radiation, months, ncol = 2)
+
+hours <- visreg(fit_glm_month_hour, "hour", scale = "response", gg = TRUE) + ylim(0, 0.6)
+precip <- visreg(fit_glm_month_hour, "precip", scale = "response", gg = TRUE) + ylim(0, 0.6)
+lightnings_hour_n <- visreg(fit_glm_month_hour, "lightnings_hour_n", scale = "response", gg = TRUE) + ylim(0, 0.6)
+rel_humid <- visreg(fit_glm_month_hour, "rel_humid", scale = "response", gg = TRUE) + ylim(0, 0.6)
+grid.arrange(hours, precip, lightnings_hour_n, rel_humid, ncol = 2)
+```
+
+
+
+
