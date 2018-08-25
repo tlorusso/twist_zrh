@@ -1,0 +1,54 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# descriptive daily plots
+```{r}
+library(dplyr)
+library(ggplot2)
+library(sf)
+library(varhandle)
+library(tidyr)
+library(ggplot2)
+library(hrbrthemes)
+library(lubridate)
+
+
+twist_zrh_cleaned <-readRDS("twist_zrh_cleaned.RDS")
+
+# median verspätung über das jahr landungen verspätungen
+twist_daily <-twist_zrh_cleaned %>%  
+  group_by(date,start_landing) %>% 
+  summarize(mean_delay=as.numeric(mean(diff_in_secs)), 
+            median_delay=as.numeric(median(diff_in_secs)), 
+                                    flights_n=n())
+
+# verspätung (median)
+ggplot(twist_daily, aes(as.Date(date), mean_delay))+
+  geom_line()+
+  facet_wrap(~start_landing)+
+  theme_ipsum()
+
+# Anzahl Flüge pro Tag
+ggplot(twist_daily, aes(as.Date(date),flights_n))+
+  geom_line()+
+  facet_wrap(~start_landing)+
+  theme_ipsum()
+
+ggplot(twist_daily, aes(as.Date(date),flights_n))+
+  geom_line()+
+  facet_wrap(~start_landing)+
+  theme_ipsum()
+
+```
+
+
+
+```{r}
+
+
+
+
+```
+
