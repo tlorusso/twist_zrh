@@ -149,12 +149,14 @@ library(ggcal)
 cal <- twist_zrh_night %>%  filter(night==1)
 ```
 
-#Number of Flights between 23:30-6
+# Flights between 23:30-6:00
+
+## Number per day
 ```{r}
 ggcal(cal$date,cal$flights_n)
 ```
 
-#Share of Flights between 23:30-6
+## In proportion of daily flights
 ```{r}
 ggcal(cal$date,cal$freq)
 
