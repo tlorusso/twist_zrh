@@ -3,7 +3,7 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-# descriptive daily plots
+# descriptive plots (daily)
 ```{r}
 library(dplyr)
 library(ggplot2)
@@ -16,16 +16,27 @@ library(lubridate)
 
 
 twist_zrh_cleaned <-readRDS("twist_zrh_cleaned.RDS")
+ 
 
 # median verspätung über das jahr landungen verspätungen
 twist_daily <-twist_zrh_cleaned %>%  
   group_by(date,start_landing) %>% 
-  summarize(mean_delay=as.numeric(mean(diff_in_secs)), 
-            median_delay=as.numeric(median(diff_in_secs)), 
-                                    flights_n=n())
+  summarize(flights_n=n(),
+            mean_delay=as.numeric(mean(diff_in_secs)), 
+            median_delay=as.numeric(median(diff_in_secs)),
+            precip=sum(precip),
+            temp_avg=mean(temp_avg),
+            precip=sum(precip),
+             lightnings_hour_f=sum(lightnings_hour_f)) 
 
 # verspätung (median)
 ggplot(twist_daily, aes(as.Date(date), mean_delay))+
+  geom_line()+
+  facet_wrap(~start_landing)+
+  theme_ipsum()
+
+# verspätung (median)
+ggplot(twist_daily, aes(as.Date(date), median_delay))+
   geom_line()+
   facet_wrap(~start_landing)+
   theme_ipsum()
@@ -34,19 +45,73 @@ ggplot(twist_daily, aes(as.Date(date), mean_delay))+
 ggplot(twist_daily, aes(as.Date(date),flights_n))+
   geom_line()+
   facet_wrap(~start_landing)+
-  theme_ipsum()
+  theme_ipsum()+
+  labs(title="Number of Flights")
 
-ggplot(twist_daily, aes(as.Date(date),flights_n))+
+# Temperatur
+ggplot(twist_daily, aes(as.Date(date),temp_avg))+
   geom_line()+
-  facet_wrap(~start_landing)+
-  theme_ipsum()
+  theme_ipsum()+
+  labs(title="Temperature (avg)")
+
+
+```
+
+# Nachtflugverbot - v.a. im Sommer ? 
+```{r}
+
+#dummy für nachtflugverbot
+twist_zrh_night <- readRDS("twist_zrh_cleaned.RDS") %>% 
+                        mutate(hour=hour(effective_time)) %>% 
+                        mutate(night=ifelse(hour<6,1,0)) %>% 
+  group_by(date,start_landing, night) %>% 
+  summarize(flights_n=n() )%>% 
+   mutate(freq =flights_n / sum(flights_n)*100)
+
+#
+
+devtools::install_github("jayjacobs/ggcal")
+
+library(ggcal)
+
+cal <- twist_zrh_night %>%  filter(night==1)
+
+ggcal(cal$date,cal$freq)
 
 ```
 
 
-
+# Modelling with xgboost ---
 ```{r}
 
+data <- twist_zrh_cleaned %>% mutate(delay=ifelse(diff_in_secs>1800,1,0)) %>% select(-geometry)
+
+install.packages("xgboost", repos="http://dmlc.ml/drat/", type = "source")
+
+library(xgboost)
+library(magrittr)
+library(dplyr)
+library(Matrix)
+
+
+# Partition data
+set.seed(1234)
+ind <- sample(2, nrow(data), replace = T, prob = c(0.8, 0.2))
+train <- data[ind==1,]
+test <- data[ind==2,]
+
+# Create matrix - One-Hot Encoding for Factor variables
+trainm <- sparse.model.matrix(delay ~ .-1, data = train)
+head(trainm)
+train_label <- train[,"delay"]
+train_matrix <- xgb.DMatrix(data = as.matrix(trainm), label = train_label)
+
+
+testm <- sparse.model.matrix(admit~.-1, data = test)
+test_label <- test[,"delay"]
+test_matrix <- xgb.DMatrix(data = as.matrix(testm), label = test_label)
+
+#### WORK IN PROGRESS 
 
 
 
