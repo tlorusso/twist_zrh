@@ -1,10 +1,16 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "Air Traffic Challenge"
+output: 
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+    toc: true 
+    number_sections: true 
+    df_print: paged
 ---
 
-# descriptive plots (daily)
-```{r}
+# Data manipulation (daily stats)
+```{r,warning=FALSE, message=FALSE}
 library(dplyr)
 library(ggplot2)
 library(sf)
@@ -14,11 +20,9 @@ library(ggplot2)
 library(hrbrthemes)
 library(lubridate)
 
-
 twist_zrh_cleaned <-readRDS("twist_zrh_cleaned.RDS")
- 
 
-# median verspätung über das jahr landungen verspätungen
+# flights per day, median / mean delays per day, precipitation etc.
 twist_daily <-twist_zrh_cleaned %>%  
   group_by(date,start_landing) %>% 
   summarize(flights_n=n(),
@@ -27,93 +31,185 @@ twist_daily <-twist_zrh_cleaned %>%
             precip=sum(precip),
             temp_avg=mean(temp_avg),
             precip=sum(precip),
-             lightnings_hour_f=sum(lightnings_hour_f)) 
+            lightnings_hour_f=sum(lightnings_hour_f))
+```
 
-# verspätung (median)
+# Descriptive Analysis
+```{r,warning=FALSE, message=FALSE}
+# delay (mean)
 ggplot(twist_daily, aes(as.Date(date), mean_delay))+
   geom_line()+
   facet_wrap(~start_landing)+
   theme_ipsum()
 
-# verspätung (median)
+# delay  (median)
 ggplot(twist_daily, aes(as.Date(date), median_delay))+
   geom_line()+
+  geom_smooth(se=F)+
   facet_wrap(~start_landing)+
   theme_ipsum()
 
-# Anzahl Flüge pro Tag
+# flights per day
 ggplot(twist_daily, aes(as.Date(date),flights_n))+
   geom_line()+
+  geom_smooth(se=F)+
   facet_wrap(~start_landing)+
   theme_ipsum()+
   labs(title="Number of Flights")
 
-# Temperatur
+# Temperature
 ggplot(twist_daily, aes(as.Date(date),temp_avg))+
   geom_line()+
+  geom_smooth(se=F)+
   theme_ipsum()+
   labs(title="Temperature (avg)")
+
+```
+
+# Visualization of Mean Delay per Flight Routes
+```{r}
+
+if (!require("pacman")) install.packages("pacman")
+
+pacman::p_load(dplyr,sf,lwgeom,ggplot2,maps,maptools,rgeos)
+
+#read in flight data
+flight_sf <- readRDS("flight_sf.RDS")
+
+
+#read in flight data
+#filter flights for a single date
+vizdata_del <- flight_sf %>% 
+               group_by(origin_destination,start_landing) %>% 
+               summarize(mean_delay=mean(diff/60),n=n())
+
+
+#create a new geometry : lines connecting Zurich Airport and the destination/origin of the flight
+vizdata_del$flightline <- sf::st_union(vizdata_del$geometry, st_as_sfc("POINT(8 47)",crs=st_crs("+proj=longlat +datum=WGS84 +no_defs"))) %>% 
+  st_cast("LINESTRING")
+
+#get worldmap
+world1 <- sf::st_as_sf(maps::map('world', plot = FALSE, fill = TRUE))
+
+#plot on top (new ggplot2 2.3.0 version needed!)
+ggplot(vizdata_del)+
+  geom_sf(aes(geometry=flightline))+
+  geom_sf(data=world1)
+
+#we can now set the "flightline"-geometry as the main geometry in our dataset
+st_geometry(vizdata_del) = "flightline"
+
+#transform worldmap and flights into spheric projection
+world2 <- sf::st_transform(
+  world1,
+  "+proj=laea +y_0=0 +lon_0=8 +lat_0=47 +ellps=WGS84 +no_defs"
+)
+
+flights2 <- sf::st_transform(
+  vizdata_del,
+  "+proj=laea +y_0=0 +lon_0=8 +lat_0=47 +ellps=WGS84 +no_defs"
+)  
+
+#Plot!
+ggplot() + 
+  geom_sf(data=world2, color="white",size=0.2)+
+  geom_sf(data=flights2 %>% filter(n>=100), aes(color=as.numeric(mean_delay), alpha=0.8),size=0.2,show.legend = "line")+
+  theme_void()+
+  scale_color_viridis_c(name="")+
+  guides(alpha=F)+
+  coord_sf(ndiscr=1000)+
+  theme(plot.background = element_rect(fill="#f5f5f2"))+
+  facet_wrap(~start_landing)+
+  labs(title="Mean Delay per Flight Route",subtitle="Routes with >=100 Flights, 2017\n\n")
 
 
 ```
 
-# Nachtflugverbot - v.a. im Sommer ? 
+# Flights by Night (23:30-6:00)
 ```{r}
 
-#dummy für nachtflugverbot
+#dummy for nightflights
 twist_zrh_night <- readRDS("twist_zrh_cleaned.RDS") %>% 
-                        mutate(hour=hour(effective_time)) %>% 
-                        mutate(night=ifelse(hour<6,1,0)) %>% 
+                        mutate(hour=hour(effective_time)+minute(effective_time)/60) %>% 
+                        mutate(night=ifelse(hour<6 |hour>=23.5,1,0)) %>% 
   group_by(date,start_landing, night) %>% 
-  summarize(flights_n=n() )%>% 
+  summarize(flights_n=n())%>% 
    mutate(freq =flights_n / sum(flights_n)*100)
 
-#
+twist_zrh_night %>% 
+  group_by(start_landing, night) %>% 
+  summarize(n=sum(flights_n))
+
+# ----
 
 devtools::install_github("jayjacobs/ggcal")
 
 library(ggcal)
 
 cal <- twist_zrh_night %>%  filter(night==1)
+```
 
+#Number of Flights between 23:30-6
+```{r}
+ggcal(cal$date,cal$flights_n)
+```
+
+#Share of Flights between 23:30-6
+```{r}
 ggcal(cal$date,cal$freq)
 
 ```
 
-
-# Modelling with xgboost ---
+# 
 ```{r}
 
-data <- twist_zrh_cleaned %>% mutate(delay=ifelse(diff_in_secs>1800,1,0)) %>% select(-geometry)
-
-install.packages("xgboost", repos="http://dmlc.ml/drat/", type = "source")
-
-library(xgboost)
-library(magrittr)
-library(dplyr)
-library(Matrix)
+```
 
 
-# Partition data
-set.seed(1234)
-ind <- sample(2, nrow(data), replace = T, prob = c(0.8, 0.2))
-train <- data[ind==1,]
-test <- data[ind==2,]
-
-# Create matrix - One-Hot Encoding for Factor variables
-trainm <- sparse.model.matrix(delay ~ .-1, data = train)
-head(trainm)
-train_label <- train[,"delay"]
-train_matrix <- xgb.DMatrix(data = as.matrix(trainm), label = train_label)
 
 
-testm <- sparse.model.matrix(admit~.-1, data = test)
-test_label <- test[,"delay"]
-test_matrix <- xgb.DMatrix(data = as.matrix(testm), label = test_label)
-
-#### WORK IN PROGRESS 
-
-
+```{r}
 
 ```
+
+
+<!-- # Modelling with xgboost --- -->
+<!-- ```{r} -->
+
+<!-- data <- twist_zrh_cleaned %>% mutate(delay=ifelse(diff_in_secs>1800,1,0)) %>%  -->
+<!--   select(-geometry) -->
+
+
+
+<!-- install.packages("xgboost", repos="http://dmlc.ml/drat/", type = "source") -->
+
+<!-- library(xgboost) -->
+<!-- library(magrittr) -->
+<!-- library(dplyr) -->
+<!-- library(Matrix) -->
+
+
+<!-- # Partition data -->
+<!-- set.seed(1234) -->
+<!-- ind <- sample(2, nrow(data), replace = T, prob = c(0.8, 0.2)) -->
+<!-- train <- data[ind==1,] -->
+<!-- test <- data[ind==2,] -->
+
+<!-- # Create matrix - One-Hot Encoding for Factor variables -->
+<!-- trainm <- sparse.model.matrix(delay ~ .-1, data = train) -->
+<!-- head(trainm) -->
+<!-- train_label <- train[,"delay"] -->
+<!-- train_matrix <- xgb.DMatrix(data = as.matrix(trainm),  -->
+<!--                             label = train_label) -->
+
+<!-- #  -->
+<!-- testm <- sparse.model.matrix(admit~.-1, data = test) -->
+<!-- test_label <- test[,"delay"] -->
+<!-- test_matrix <- xgb.DMatrix(data = as.matrix(testm), label = test_label) -->
+
+<!-- #### WORK IN PROGRESS  -->
+
+
+
+<!-- ``` -->
 
