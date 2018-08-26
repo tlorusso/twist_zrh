@@ -1,3 +1,16 @@
+### Team Airtraffic is creating insightful visualizations of air traffic from / to Zurich Airport and predicting delays
+
+So far, we have:
+- conducted __exploratory data analysis__ and produced many descriptive visualizations to get to know the data and get a first understanding of which aspects of it might be relevant and interesting
+- experimented with a broad variety of modelling approaches (linear approaches, binary logistic regressions, ridge regression...) __to predict delays__
+-fitted a model that predicted delays on the test data with a high accuracy
+
+__Next steps :__
+
+1. Try further prediction-approaches (baynesian, random forest e.g.) 
+2. Create some further insightful visualizations
+2. Discuss what the model could be used for (flight delay prediction app? ) 
+
 # Flight data for ML-prediction challenge at the TWIST2018-Hackdays
 
 This repository contains data of planed and effective flight arrival and departure-times from / to the airport of Zurich for the entire year 2017. 
