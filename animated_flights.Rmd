@@ -30,8 +30,10 @@ pacman::p_load(dplyr,sf,lwgeom,ggplot2,maps,maptools,rgeos)
 
 #read in flight data
 flight_sf <- readRDS("flight_sf.RDS")
+
+flight_sf <- readRDS("twist_zrh_cleaned.RDS")
 #filter flights for a single date
-vizdata <- flight_sf %>% filter(date=="01.01.2017")
+vizdata <- flight_sf %>% filter(date=="2017-01-01")
 
 #create a new geometry : lines connecting Zurich Airport and the destination/origin of the flight
 vizdata$flightline <- sf::st_union(vizdata$geometry, st_as_sfc("POINT(8 47)",crs=st_crs("+proj=longlat +datum=WGS84 +no_defs"))) %>% 
@@ -62,16 +64,22 @@ flights2 <- sf::st_transform(
 #Plot!
 ggplot() + 
   geom_sf(data=world2, color="white",size=0.2)+
-  geom_sf(data=flights2, aes(color=as.numeric(diff), alpha=0.8),size=0.2,show.legend = "line")+
+  geom_sf(data=flights2, aes(color=as.numeric(diff_in_secs/60), size=as.numeric(diff_in_secs/60)),show.legend = "line")+
   theme_void()+
- scale_color_viridis_c(name="")+
+ scale_color_viridis_c(name="Delay (min)")+
   guides(alpha=F)+
   coord_sf(ndiscr=1000)+
+  theme_ipsum()+
+  guides(size=F)+
   theme(plot.background = element_rect(fill="#f5f5f2"))+
   transition_time(effective_time) +
-  ease_aes('linear')
+  ease_aes('linear',interval = 0.2)+
+  labs(title="A day of Flightmovements from / to ZRH",
+       subtitle = 'Time : {frame_time}') 
 
+# ?transition_time
 
+anim_save("plot.gif")
 
 ```
 
