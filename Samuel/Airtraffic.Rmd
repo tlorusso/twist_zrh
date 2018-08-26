@@ -69,7 +69,7 @@ flightdata_stand_starting <- flightdata_stand %>%
 
 # EDA visualization
 ## Looking at time difference distribution
-```{r}
+```{r fig.width = 10}
 plot_all <- flightdata %>%
   ggplot(aes(x = diff_in_secs)) + 
     geom_histogram(bins = 60, col = 1) +
@@ -90,7 +90,7 @@ The *distribution of the difference* in seconds has many extreme values and also
 
 
 ## Boxplots for different months and hours of the day
-```{r}
+```{r fig.width = 10}
 flightdata %>%
   filter(abs(diff_in_secs) < 5000) %>%
   ggplot(aes(x = month, y = as.numeric(diff_in_secs))) + 
@@ -108,7 +108,7 @@ Looking at the distribution of the difference in seconds for the different *mont
 Similar periodic patterns are visibile when looking at the the distribution of the difference in seconds at the different *hours* of the day. More delays occur in the morning compared to lunchtime, the afternoon, and in the evening.
 
 
-## Comparing Schengen to non-Schengen
+## Comparing Schengen to non-Schengen, continents, airport type
 ```{r}
 flightdata %>%
   ggplot(aes(x = schengen, y = as.numeric(diff_in_secs))) +
@@ -116,12 +116,23 @@ flightdata %>%
     facet_wrap(~ start_landing) +
     ylim(-5000, 5000) +
     labs(y = "Difference in seconds")
+
+flightdata %>%
+  filter(abs(diff_in_secs) < 5000) %>%
+  ggplot(aes(x = continent, y = as.numeric(diff_in_secs))) +
+    geom_boxplot()
+
+flightdata %>%
+  filter(abs(diff_in_secs) < 5000) %>%
+  ggplot(aes(x = airport_type, y = as.numeric(diff_in_secs))) +
+    geom_boxplot()
+
 ```
 
-Visually there is no difference in the distribution of the difference in seconds visible *comparing Schengen to Non-Schengen* flights.
+Visually there is no difference in the distribution of the difference in seconds visible *comparing Schengen to Non-Schengen* flights. Also the delays looks similar *comparing continents* and *comparing large and medium airport*.
 
-## Airlines and airplane types
-```{r fig.height = 10}
+## Airlines, airplane types, destination and origin
+```{r fig.width = 10}
 flightdata %>%
   arrange(airline_name) %>%
   group_by(airline_name) %>%
@@ -131,7 +142,7 @@ flightdata %>%
     geom_boxplot() +
     geom_hline(yintercept = 0, col = 4) +
     facet_wrap(~ start_landing) + 
-    ylim(-5000, 10000) +
+    ylim(-2000, 5000) +
     coord_flip() +
     labs(x = "Airline name", y = "Difference in seconds", 
          title = "Airlines with more than 1000 flights")
@@ -145,10 +156,24 @@ flightdata %>%
     geom_boxplot() +
     geom_hline(yintercept = 0, col = 4) +
     facet_wrap(~ start_landing) +
-    ylim(-5000, 10000) +
+    ylim(-2000, 5000) +
     coord_flip() +
     labs(x = "Airplane type", y = "Difference in seconds", 
          title = "Airplane types with more than 100 flights")
+
+flightdata %>%
+  arrange(origin_destination_name) %>%
+  group_by(origin_destination_name) %>%
+  filter(n() > 3000) %>%
+  ggplot(aes(x = origin_destination_name, y = as.numeric(diff_in_secs), 
+                         group = origin_destination_name)) +
+    geom_boxplot() +
+    geom_hline(yintercept = 0, col = 4) +
+    facet_wrap(~ start_landing) +
+    ylim(-2000, 5000) +
+    coord_flip() +
+    labs(x = "Destination / Origin", y = "Difference in seconds", 
+         title = "Destination / Origin with more than 3000 flights")
 ```
 
 Looking at the difference in seconds distributions conditioned on the different *airlines*, it's clearly visible that some of them have more and longer delays than others. Thinking about possible explanations for the more frequent delays of different airlines we hypothesize that low-cost airlines (e.g. Air Berlin) try to minimize the time on the ground because of monetary reasons. Also we think that higher security standards could explain the more frequent delays of other airlines (e.g. El Al Israel).
@@ -157,7 +182,7 @@ Also visually visible are delay differences between the *different airplane* typ
 
 
 ## Correlations between different quantitative covariates
-```{r}
+```{r fig.width = 10}
 library(ggcorrplot)
 num_cov <- flightdata[,c("temp_avg", "temp_min", "temp_max", 
                       "sunshine_dur_min","global_rad_avg_h", "precip", "winddir_h",
@@ -285,24 +310,24 @@ I then tried to evaluate the logistic regression model with 10-fold crossvalidat
 
 
 ## Plotting model predictions (probability scale)
-```{r fig.height = 5}
+```{r fig.width = 10}
 library(visreg)
-distance <- visreg(fit_glm_month_hour, "distance_km", scale = "response", gg = TRUE) + ylim(0, 0.6)
-windspeed <- visreg(fit_glm_month_hour, "windspeed_avg_h", scale = "response", gg = TRUE) + ylim(0, 0.6)
-airpressure <- visreg(fit_glm_month_hour, "airpres", scale = "response", gg = TRUE) + ylim(0, 0.6)
-lightning <- visreg(fit_glm_month_hour, "lightnings_hour_f", scale = "response", gg = TRUE) + ylim(0, 0.6)
+distance <- visreg(fit_glm_month_hour, "distance_km", scale = "response", gg = TRUE) + ylim(0, 0.5)
+windspeed <- visreg(fit_glm_month_hour, "windspeed_avg_h", scale = "response", gg = TRUE) + ylim(0, 0.5)
+airpressure <- visreg(fit_glm_month_hour, "airpres", scale = "response", gg = TRUE) + ylim(0, 0.5)
+lightning <- visreg(fit_glm_month_hour, "lightnings_hour_f", scale = "response", gg = TRUE) + ylim(0, 0.5)
 grid.arrange(distance, windspeed, airpressure, lightning, ncol = 2)
 
-sunshine <- visreg(fit_glm_month_hour, "sunshine_dur_min", scale = "response", gg = TRUE) + ylim(0, 0.6)
-windspeed <- visreg(fit_glm_month_hour, "windspeed_avg_h", scale = "response", gg = TRUE) + ylim(0, 0.6)
-global_radiation <- visreg(fit_glm_month_hour, "global_rad_avg_h", scale = "response", gg = TRUE) + ylim(0, 0.6)
-months <- visreg(fit_glm_month_hour, "month", scale = "response", gg = TRUE) + ylim(0, 0.6)
+sunshine <- visreg(fit_glm_month_hour, "sunshine_dur_min", scale = "response", gg = TRUE) + ylim(0, 0.5)
+windspeed <- visreg(fit_glm_month_hour, "windspeed_avg_h", scale = "response", gg = TRUE) + ylim(0, 0.5)
+global_radiation <- visreg(fit_glm_month_hour, "global_rad_avg_h", scale = "response", gg = TRUE) + ylim(0, 0.5)
+months <- visreg(fit_glm_month_hour, "month", scale = "response", gg = TRUE) + ylim(0, 0.5)
 grid.arrange(sunshine, windspeed, global_radiation, months, ncol = 2)
 
-hours <- visreg(fit_glm_month_hour, "hour", scale = "response", gg = TRUE) + ylim(0, 0.6)
-precip <- visreg(fit_glm_month_hour, "precip", scale = "response", gg = TRUE) + ylim(0, 0.6)
-lightnings_hour_n <- visreg(fit_glm_month_hour, "lightnings_hour_n", scale = "response", gg = TRUE) + ylim(0, 0.6)
-rel_humid <- visreg(fit_glm_month_hour, "rel_humid", scale = "response", gg = TRUE) + ylim(0, 0.6)
+hours <- visreg(fit_glm_month_hour, "hour", scale = "response", gg = TRUE) + ylim(0, 0.5)
+precip <- visreg(fit_glm_month_hour, "precip", scale = "response", gg = TRUE) + ylim(0, 0.5)
+lightnings_hour_n <- visreg(fit_glm_month_hour, "lightnings_hour_n", scale = "response", gg = TRUE) + ylim(0, 0.5)
+rel_humid <- visreg(fit_glm_month_hour, "rel_humid", scale = "response", gg = TRUE) + ylim(0, 0.5)
 grid.arrange(hours, precip, lightnings_hour_n, rel_humid, ncol = 2)
 ```
 
@@ -331,7 +356,7 @@ glm_mixed <- as.formula(delayed ~ distance_km + windspeed_avg_h + schengen
 We tried to fit a mixed logistic regression model with random intercepts for airline and airplane types, but the optimization ran into numerical issues.
 
 ## Bayesian logistic regression model with lasso prior
-```{r}
+```{r fig.width = 10}
 library(brms)
 glm_bayes <- as.formula(delayed ~ distance_km + windspeed_avg_h + schengen
                         + rel_humid + lightnings_hour_n + lightnings_hour_f
@@ -356,7 +381,7 @@ plots <- plot(marginal_effects(bayes_glm,
                                            "windspeed_avg_h", "global_rad_avg_h",
                                            "precip", "lightnings_hour_n", "rel_humid")))
 ```
-```{r fig.height = 10}
+```{r fig.width = 10}
 grid.arrange(plots$distance_km, plots$windspeed_avg_h, plots$airpres, 
              plots$lightnings_hour_f, plots$sunshine_dur_min, plots$windspeed_avg_h,
              plots$global_rad_avg_h, plots$precip, plots$lightnings_hour_n, plots$rel_humid,
