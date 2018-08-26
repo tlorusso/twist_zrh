@@ -23,4 +23,12 @@
     - More lightnings nearby are associated with lower delay probability
     - More relative humidity is associated with higher delay probability. This is counterintuitive and we don't really have an explanation.
 * We tried to fit a mixed logistic regression model with random intercepts for airline and airplane types, but the optimization ran into numerical issues
-* 
+* We also fitted a Bayesian logistic regression model with lasso regularization priors. THe coefficients mean estimates turned out to be very similar to the frequentistic logistic regression model. 
+
+## What could be done in the future
+* Try to rewrite the code less messy
+* Use dimension reduction techniques like PCA to have less covariates and then regress the outcome on them
+* Not categorize the delay time and try to transform it / use more robust methods
+* Use random effects in the Bayesian model for airlines and airplanes
+* Analyze the delays of landing flights by also getting the weather data of the destination from where they came from
+* Use more complex models (boosting, random forests, neural networks) to improve predicitive performance (at the cost of interpretability)
