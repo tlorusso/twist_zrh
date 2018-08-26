@@ -11,7 +11,7 @@ __Next steps :__
 2. Create some further insightful visualizations
 2. Discuss what the model could be used for (flight delay prediction app? ) 
 
-# Flight data for ML-prediction challenge at the TWIST2018-Hackdays
+### Flight data for ML-prediction challenge at the TWIST2018-Hackdays
 
 This repository contains data of planed and effective flight arrival and departure-times from / to the airport of Zurich for the entire year 2017. 
 
