@@ -5,13 +5,24 @@
 library(tidyverse)
 library(caret)
 library(xgboost)
+library(lubridate)
 
 setwd("~/github/twist_zrh")
 
-twist_zrh_cleaned <- readRDS("~/github/twist_zrh/twist_zrh_cleaned.RDS")
+twist_zrh_cleaned <- readRDS("~/github/twist_zrh/twist_zrh_cleaned.RDS") %>% select(-geometry,-airport_type,
+                                                                                    -iso_country,-flightnr,-iso_region,
+                                                                                    -origin_destination_name,
+                                                                                    -municipality)
 
 flightdata <- twist_zrh_cleaned %>%
-  mutate(delayed = ifelse(abs(as.numeric(diff_in_secs)) > 1800, 1, 0)) %>% (-geometry)
+  mutate(delayed = ifelse(abs(as.numeric(diff_in_secs)) > 1800, 1, 0)) %>% 
+  mutate(month = month(date),
+         hour = hour(planed_time),
+         continent = as.character(continent)) %>%
+  mutate(month = as.factor(month),
+         hour = as.factor(hour),
+         continent = as.factor(continent)) %>% 
+  select(-date, -effective_time,-planed_time,-airline_code)
 
 # flightdata_landing <- flightdata %>%
 #   filter(start_landing == "L")
@@ -25,13 +36,13 @@ flightdata_starting <- flightdata %>%
 
 set.seed(3456)
 # split into training and test datasets
-trainIndex <- createDataPartition(flightdata_starting$flightnr, p = .8, 
+trainIndex <- createDataPartition(flightdata_starting$airline_name, p = .8, 
                                   list = FALSE, 
                                   times = 1)
 
 
-flighttrain <- flightdata_starting[ trainIndex,] %>% select_if(is.numeric)
-flighttest  <- flightdata_starting[-trainIndex,] %>% select_if(is.numeric)
+flighttrain <- flightdata_starting[ trainIndex,][c(5:24)]
+flighttest  <- flightdata_starting[-trainIndex,][c(5:24)]
 
 predictors = colnames(flighttrain[-ncol(flighttrain)])
 #xgboost works only if the labels are numeric. Hence, convert the labels (Species) to numeric.
@@ -39,7 +50,17 @@ predictors = colnames(flighttrain[-ncol(flighttrain)])
 label = as.numeric(flighttrain[,ncol(flighttrain)])
 print(table (label))
 
-
+#work in progress
+ x.train <- model.matrix(delayed~.,data=flighttrain)
+ 
+ 
+ bst = xgboost(
+   data =x.train,
+   label = label,
+   nrounds=200,
+   objective = "binary:logistic")
+ 
+ 
 # #Alas, xgboost works only if the numeric labels start from 0. Hence, subtract 1 from the label.
 # label = as.numeric(flighttrain[,ncol(flighttrain)])-1
 # print(table (label))
@@ -86,6 +107,14 @@ flighttest$prediction = predict(bst, as.matrix(flighttest[,predictors]))
 flighttest$prediction01 <- as.numeric(flighttest$prediction > 0.5)
 
 mean(flighttest$prediction01 != flighttest$delayed)
+
+#anteil verspätete -> 0.98
+delayfreq<-flightdata %>% 
+  group_by(delayed) %>% 
+  summarize(n=n()) %>% 
+  mutate(n=n/sum(n))
+
+
 
 
 
