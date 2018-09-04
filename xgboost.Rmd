@@ -15,12 +15,20 @@ output:
 library(tidyverse)
 library(caret)
 library(xgboost)
+library(lubridate)
 
 twist_zrh_cleaned <- readRDS("twist_zrh_cleaned.RDS")
 
 flightdata <- twist_zrh_cleaned %>%
   mutate(delayed = ifelse(abs(as.numeric(diff_in_secs)) > 1800, 1, 0)) %>% 
-  select(-geometry)
+  select(-geometry) %>% 
+   mutate(month = month(date),
+         hour = hour(planed_time),
+         continent = as.character(continent)) %>%
+  mutate(month = as.factor(month),
+         hour = as.factor(hour),
+         continent = as.factor(continent)) %>% 
+  mutate(snow=ifelse(temp_avg<0 & precip>2,1,0))
 
 # flightdata_landing <- flightdata %>%
 #   filter(start_landing == "L")
@@ -32,20 +40,20 @@ flightdata_starting <- flightdata %>%
 
 
 ```{r, warning=F, message=F}
-set.seed(3456)
-# split into training and test datasets
-trainIndex <- createDataPartition(flightdata_starting$delayed, p = .8, 
-                                  list = FALSE, 
-                                  times = 1)
-
-
-flighttrain <- flightdata_starting[ trainIndex,] %>% select_if(is.numeric)
-flighttest  <- flightdata_starting[-trainIndex,] %>% select_if(is.numeric)
-
-predictors = colnames(flighttrain[-ncol(flighttrain)])
-#xgboost works only if the labels are numeric. Hence, the labels have to be converted to numeric
-
-label = as.numeric(flighttrain[,ncol(flighttrain)])
+# set.seed(3456)
+# # split into training and test datasets
+# trainIndex <- createDataPartition(flightdata_starting$delayed, p = .8, 
+#                                   list = FALSE, 
+#                                   times = 1)
+# 
+# 
+# flighttrain <- flightdata_starting[ trainIndex,] %>% select_if(is.numeric)
+# flighttest  <- flightdata_starting[-trainIndex,] %>% select_if(is.numeric)
+# 
+# predictors = colnames(flighttrain[-ncol(flighttrain)])
+# #xgboost works only if the labels are numeric. Hence, the labels have to be converted to numeric
+# 
+# label = as.numeric(flighttrain[,ncol(flighttrain)])
 ```
 
 TO DO : cross validation!
@@ -81,30 +89,29 @@ TO DO : cross validation!
 # Step 2: Train the xgboost model using min.loss.idx found above.
 #         Note, we have to stop at the round where we get the minumum error.
 
-set.seed(100)
-
-bst = xgboost(
-  data =as.matrix(flighttrain[,predictors]),
-  label = label,
-  nrounds=200,
-  print_every_n = 100,
-  objective = "binary:logistic")
-
-# Make prediction on the testing data.
-flighttest$prediction = predict(bst, as.matrix(flighttest[,predictors]))
-
-# binary
-flighttest$prediction01 <- as.numeric(flighttest$prediction > 0.5)
-
-#Prediction Error
-mean(flighttest$prediction01 != flighttest$delayed)
+# set.seed(100)
+# 
+# bst = xgboost(
+#   data =as.matrix(flighttrain[,predictors]),
+#   label = label,
+#   nrounds=200,
+#   print_every_n = 100,
+#   objective = "binary:logistic")
+# 
+# # Make prediction on the testing data.
+# flighttest$prediction = predict(bst, as.matrix(flighttest[,predictors]))
+# 
+# # binary
+# flighttest$prediction01 <- as.numeric(flighttest$prediction > 0.5)
+# 
+# #Prediction Error
+# mean(flighttest$prediction01 != flighttest$delayed)
 ```
 
 
 
-### Model with factor-variables
+### Model with all variables (numeric / factor)
 
-To DO: create month / day variables
 ```{r}
 
 library(Matrix)
@@ -113,7 +120,7 @@ library(Matrix)
 # Create a stratified random sample to create train and test sets
 # Reference the outcome variable
 
-flightdata_starting <-flightdata_starting %>% select(airline_code, flightnr, airplane_type, origin_destination_code,distance_km, iso_country,iso_region,continent,schengen,lightnings_hour_f,lightnings_hour_n,winddir_h,windspeed_avg_h,windspeed_peak_h,global_rad_avg_h,airpres,sunshine_dur_min,temp_avg,temp_min,temp_max,rel_humid, delayed,precip) %>% 
+flightdata_starting <-flightdata_starting %>% select(airline_code, flightnr, airplane_type, origin_destination_code,distance_km, snow, month,hour, iso_country,iso_region,continent,schengen,lightnings_hour_f,lightnings_hour_n,winddir_h,windspeed_avg_h,windspeed_peak_h,global_rad_avg_h,airpres,sunshine_dur_min,temp_avg,temp_min,temp_max,rel_humid, delayed,precip) %>% 
 #sparsematrix cannot handle NAs -> filter complete cases
   filter(complete.cases(.))
 
@@ -167,7 +174,7 @@ system.time(xgb <- xgboost(params  = param,
 
 ```
 
-The model is really bad at predicting delays. At a threshold of 0.5 it does not predict any delays at all. At lower thresholds the missclassification rate is significant. 
+The model is really bad at predicting delays. At a threshold of 0.5 it predicts just a few delay. At lower thresholds the missclassification rate is significant. 
 ```{r}
 pred <- predict(xgb, dtest)
 
@@ -175,7 +182,7 @@ test$prediction <- pred
   
 test$prediction01 <-  ifelse(test$prediction >= 0.5, 1, 0)
 
-# Problem -> the model is predicts no delays at all!
+# Problem -> the model predicts almost no delays
 test %>% 
   group_by(delayed,prediction01) %>% 
   count()
