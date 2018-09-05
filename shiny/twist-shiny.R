@@ -1,9 +1,3 @@
----
-output: html_document
-runtime: shiny
----
-
-rm(list = ls())
 library(shiny)
 library(tidyverse)
 library(lubridate)
@@ -31,7 +25,7 @@ ui <- fluidPage(
     sidebarPanel(
            sliderInput(
              inputId = "absolute_diff",
-             label = "Only look at differences between expected and actual arrival / departure measured in minutes which is smaller than..",
+             label = "Only look at differences between expected and actual arrival / departure measured in minutes which are smaller than..",
              min = 0,
              max = 1000,
              value = 40),
@@ -87,7 +81,7 @@ server <- function(input, output){
         filter(abs(diff_in_minutes) < input$absolute_diff) %>% 
         ggplot(aes_string(x = input$variable, y = "diff_in_minutes")) +
         geom_jitter(alpha = 0.5) +
-        geom_smooth(method = "gam", se = FALSE, aes(col = "gam")) + 
+        geom_smooth(method = "gam", se = FALSE, aes(col = "Smoothing Spline")) + 
         labs(y = "Difference in minutes") +
         facet_wrap(~ start_landing)  +
         theme(legend.position="bottom") +
@@ -102,9 +96,9 @@ server <- function(input, output){
               c("airline_name", "airplane_type", "origin_destination_name")) == TRUE){
         flights %>% 
           arrange_(input$variable) %>%
-          filter(abs(diff_in_minutes) < input$absolute_diff) %>% 
           group_by_(input$variable) %>% 
           filter(n() > 1000) %>% 
+          filter(abs(diff_in_minutes) < input$absolute_diff) %>% 
           ggplot(aes_string(x = input$variable, y = "diff_in_minutes", group = input$variable)) +
           geom_boxplot(alpha = 0.5) +
           labs(y = "Difference in minutes", subtitle = "Only looking at > 1000 flights per year") +
