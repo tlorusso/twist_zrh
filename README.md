@@ -3,7 +3,6 @@
 So far, we have:
 - conducted __exploratory data analysis__ and produced many descriptive visualizations to get to know the data and get a first understanding of which aspects of it might be relevant and interesting
 - experimented with a broad variety of modelling approaches (linear approaches, binary logistic regressions, ridge regression...) __to predict delays__
--fitted a model that predicted delays on the test data with a high accuracy
 
 __Next steps :__
 
